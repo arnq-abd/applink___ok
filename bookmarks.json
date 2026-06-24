@@ -12,12 +12,6 @@
         "visible": true
     },
     {
-        "id": "3",
-        "name": "অচল লিঙ্ক উদাহরণ / Sample Disabled Link",
-        "url": "",
-        "visible": true
-    },
-    {
         "id": "4",
         "name": "লুকানো বুকমার্ক উদাহরণ / Sample Hidden Link",
         "url": "https://example.com",
