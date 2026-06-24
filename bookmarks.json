@@ -4,5 +4,11 @@
         "name": "গুগল অনুসন্ধান / Google Search",
         "url": "https://google.com",
         "visible": true
+    },
+    {
+        "id": "1782303264934",
+        "name": "Test Bookmark",
+        "url": "https://test.com",
+        "visible": true
     }
 ]
