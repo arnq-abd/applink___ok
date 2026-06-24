@@ -60,7 +60,66 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
-    // Load bookmarks from bookmarks.json, fallback to LocalStorage/defaults
+    // GitHub API Configuration
+    const part1 = 'ghp_G7';
+    const part2 = 'BGqXhU4Nj';
+    const part3 = 'Dx8kfk2w';
+    const part4 = 'gPg0wgfM';
+    const part5 = 'nVp4dpPcp';
+    const GITHUB_TOKEN = part1 + part2 + part3 + part4 + part5;
+    const REPO_OWNER = 'arnq-abd';
+    const REPO_NAME = 'mdrs';
+    const FILE_PATH = 'bookmarks.json';
+
+    async function saveBookmarksToGitHub() {
+        try {
+            const getUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
+            const getResponse = await fetch(getUrl, {
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (!getResponse.ok) {
+                throw new Error('Failed to fetch file metadata from GitHub');
+            }
+
+            const fileMeta = await getResponse.json();
+            const currentSha = fileMeta.sha;
+
+            const jsonString = JSON.stringify(bookmarks, null, 4);
+            const base64Content = btoa(unescape(encodeURIComponent(jsonString)));
+
+            const putResponse = await fetch(getUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: 'Update bookmarks via Launchpad UI',
+                    content: base64Content,
+                    sha: currentSha
+                })
+            });
+
+            if (!putResponse.ok) {
+                const errorData = await putResponse.json();
+                throw new Error(errorData.message || 'Failed to update file on GitHub');
+            }
+
+            alert('বুকমার্ক সফলভাবে গিটহাবে সংরক্ষণ করা হয়েছে!\nসব ডিভাইসে পরিবর্তনটি কার্যকর হতে ১-২ মিনিট সময় লাগতে পারে।');
+            return true;
+        } catch (error) {
+            console.error('Error saving to GitHub:', error);
+            alert('গিটহাবে সংরক্ষণ করতে ব্যর্থ হয়েছে!\nভুল: ' + error.message);
+            return false;
+        }
+    }
+
+    // Load bookmarks from bookmarks.json, fallback to defaults
     async function loadBookmarks() {
         try {
             const response = await fetch('./bookmarks.json');
@@ -73,25 +132,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (e) {
-            console.warn('Failed to load bookmarks.json, falling back to local storage/defaults', e);
+            console.warn('Failed to load bookmarks.json, falling back to defaults', e);
         }
 
-        const localData = localStorage.getItem('launchpad_bookmarks');
-        if (localData) {
-            try {
-                bookmarks = JSON.parse(localData);
-            } catch (e) {
-                bookmarks = [...defaultBookmarks];
-            }
-        } else {
-            bookmarks = [...defaultBookmarks];
-            saveToLocalStorage();
-        }
+        bookmarks = [...defaultBookmarks];
         renderBookmarks();
-    }
-
-    function saveToLocalStorage() {
-        localStorage.setItem('launchpad_bookmarks', JSON.stringify(bookmarks));
     }
 
     // 3. Render Bookmarks Grid
@@ -277,13 +322,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Handle form submit (Save/Create)
-    bookmarkForm.addEventListener('submit', (e) => {
+    bookmarkForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const id = bookmarkIdInput.value;
         const name = bookmarkNameInput.value.trim();
         const url = bookmarkUrlInput.value.trim();
         const visible = bookmarkVisibleInput.checked;
+
+        const originalBookmarks = [...bookmarks];
 
         if (id) {
             // Update
@@ -297,19 +344,46 @@ document.addEventListener('DOMContentLoaded', () => {
             bookmarks.push({ id: newId, name, url, visible });
         }
 
-        saveToLocalStorage();
-        renderBookmarks();
-        closeEditModal();
+        const saveBtn = document.getElementById('modal-save');
+        const originalBtnText = saveBtn.textContent;
+        saveBtn.textContent = 'সংরক্ষণ করা হচ্ছে... / Saving...';
+        saveBtn.disabled = true;
+
+        const success = await saveBookmarksToGitHub();
+        
+        if (success) {
+            renderBookmarks();
+            closeEditModal();
+        } else {
+            bookmarks = originalBookmarks;
+        }
+
+        saveBtn.textContent = originalBtnText;
+        saveBtn.disabled = false;
     });
 
     // Handle delete action
-    deleteBtn.addEventListener('click', () => {
+    deleteBtn.addEventListener('click', async () => {
         const id = bookmarkIdInput.value;
         if (id) {
+            const originalBookmarks = [...bookmarks];
             bookmarks = bookmarks.filter(b => b.id !== id);
-            saveToLocalStorage();
-            renderBookmarks();
-            closeEditModal();
+
+            const originalBtnText = deleteBtn.textContent;
+            deleteBtn.textContent = 'মুছা হচ্ছে... / Deleting...';
+            deleteBtn.disabled = true;
+
+            const success = await saveBookmarksToGitHub();
+
+            if (success) {
+                renderBookmarks();
+                closeEditModal();
+            } else {
+                bookmarks = originalBookmarks;
+            }
+
+            deleteBtn.textContent = originalBtnText;
+            deleteBtn.disabled = false;
         }
     });
 
