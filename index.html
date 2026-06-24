@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="bn-BD" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>বুকমার্ক লঞ্চপ্যাড | Bookmark Launchpad</title>
+    <meta name="description" content="একটি ডাইনামিক এবং কাস্টমাইজযোগ্য বুকমার্ক ম্যানেজার।">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Background Blur Decorative Elements -->
+    <div class="bg-blur bg-blur-1"></div>
+    <div class="bg-blur bg-blur-2"></div>
+
+    <div class="container">
+        <!-- Header Controls -->
+        <header class="header-controls">
+            <h1 class="logo-title">লঞ্চপ্যাড / Launchpad</h1>
+            <div class="control-actions">
+                <!-- Editor Mode Toggle -->
+                <button id="editor-toggle" class="control-btn-text hidden" aria-label="Toggle Editor Mode">
+                    <svg class="control-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    <span>এডিট মোড / Edit Mode</span>
+                </button>
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="control-btn" aria-label="Toggle Dark/Light Theme">
+                    <svg id="moon-icon" class="theme-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                    <svg id="sun-icon" class="theme-icon hidden" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Bookmarks Section -->
+        <main>
+            <div id="bookmarks-grid" class="bookmarks-grid">
+                <!-- Bookmarks will be dynamically injected here via JS -->
+            </div>
+
+            <!-- Add Bookmark Button (Only visible in Edit Mode) -->
+            <button id="add-bookmark-btn" class="add-btn hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>নতুন বুকমার্ক যোগ করুন / Add New Bookmark</span>
+            </button>
+        </main>
+
+        <footer class="footer">
+            <p>© <span id="current-year"></span> MasterABD. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Edit Modal Dialog -->
+    <div id="bookmark-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <h2 id="modal-title">বুকমার্ক সম্পাদনা / Edit Bookmark</h2>
+            <form id="bookmark-form">
+                <input type="hidden" id="bookmark-id">
+
+                <div class="form-group">
+                    <label for="bookmark-name">নাম / Bookmark Name</label>
+                    <input type="text" id="bookmark-name" required placeholder="যেমন: গুগল, ফেসবুক, ইত্যাদি">
+                </div>
+
+                <div class="form-group">
+                    <label for="bookmark-url">লিংক / URL (ফাঁকা রাখলে অচল হবে)</label>
+                    <input type="url" id="bookmark-url" placeholder="https://example.com">
+                </div>
+
+                <div class="form-group-row">
+                    <div class="toggle-container">
+                        <label class="switch">
+                            <input type="checkbox" id="bookmark-visible" checked>
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="toggle-label">ভিজিটরদের দেখান / Show to Visitors</span>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="modal-delete" class="btn-danger hidden">মুছুন / Delete</button>
+                    <div class="modal-main-actions">
+                        <button type="button" id="modal-cancel" class="btn-secondary">বাতিল / Cancel</button>
+                        <button type="submit" id="modal-save" class="btn-primary">সংরক্ষণ / Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Password Modal Dialog -->
+    <div id="password-modal" class="modal hidden">
+        <div class="modal-overlay" id="password-overlay"></div>
+        <div class="modal-content">
+            <h2>পাসওয়ার্ড দিন / Enter Password</h2>
+            <form id="password-form">
+                <div class="form-group">
+                    <label for="password-input">পাসওয়ার্ড / Password</label>
+                    <input type="password" id="password-input" required placeholder="••••">
+                    <span id="password-error" class="hidden"
+                        style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem; display: block;">ভুল
+                        পাসওয়ার্ড! আবার চেষ্টা করুন।</span>
+                </div>
+                <div class="modal-actions">
+                    <div class="modal-main-actions" style="width: 100%;">
+                        <button type="button" id="password-cancel" class="btn-secondary" style="flex-grow: 1;">বাতিল /
+                            Cancel</button>
+                        <button type="submit" class="btn-primary" style="flex-grow: 1;">নিশ্চিত করুন / Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script File -->
+    <script src="script.js"></script>
+</body>
+
+</html>
