@@ -60,8 +60,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
-    // Load bookmarks from LocalStorage or initialize defaults
-    function loadBookmarks() {
+    // Load bookmarks from bookmarks.json, fallback to LocalStorage/defaults
+    async function loadBookmarks() {
+        try {
+            const response = await fetch('./bookmarks.json');
+            if (response.ok) {
+                const data = await response.json();
+                if (Array.isArray(data)) {
+                    bookmarks = data;
+                    renderBookmarks();
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to load bookmarks.json, falling back to local storage/defaults', e);
+        }
+
         const localData = localStorage.getItem('launchpad_bookmarks');
         if (localData) {
             try {
@@ -73,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             bookmarks = [...defaultBookmarks];
             saveToLocalStorage();
         }
+        renderBookmarks();
     }
 
     function saveToLocalStorage() {
@@ -181,18 +196,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Editor Mode Toggle Handler
     const editorToggleBtn = document.getElementById('editor-toggle');
+    const editorActionsBar = document.getElementById('editor-actions-bar');
     const addBookmarkBtn = document.getElementById('add-bookmark-btn');
+    const exportJsonBtn = document.getElementById('export-json-btn');
 
     editorToggleBtn.addEventListener('click', () => {
         isEditMode = !isEditMode;
         if (isEditMode) {
             editorToggleBtn.classList.add('active');
-            addBookmarkBtn.classList.remove('hidden');
+            editorActionsBar.classList.remove('hidden');
         } else {
             editorToggleBtn.classList.remove('active');
-            addBookmarkBtn.classList.add('hidden');
+            editorActionsBar.classList.add('hidden');
         }
         renderBookmarks();
+    });
+
+    exportJsonBtn.addEventListener('click', () => {
+        const jsonStr = JSON.stringify(bookmarks, null, 4);
+        navigator.clipboard.writeText(jsonStr).then(() => {
+            alert('বুকমার্ক কনফিগারেশন JSON ক্লিপবোর্ডে কপি হয়েছে!\n\nগিটহাবের bookmarks.json ফাইলটি এডিট করে এটি পেস্ট করুন এবং কমিট করুন।');
+        }).catch(err => {
+            console.error('Failed to copy configuration', err);
+            // Fallback: show prompt or copy manually
+            const textarea = document.createElement('textarea');
+            textarea.value = jsonStr;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('ক্লিপবোর্ডে কপি হয়েছে (ম্যানুয়াল পদ্ধতি)!\n\nগিটহাবের bookmarks.json ফাইলটি এডিট করে এটি পেস্ট করুন এবং কমিট করুন।');
+        });
     });
 
     // 5. Modal Controllers (CRUD)
@@ -330,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isEditMode) {
             isEditMode = false;
             editorToggleBtn.classList.remove('active');
-            addBookmarkBtn.classList.add('hidden');
+            editorActionsBar.classList.add('hidden');
             renderBookmarks();
         }
     }
@@ -354,5 +388,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize Page
     loadBookmarks();
-    renderBookmarks();
 });
