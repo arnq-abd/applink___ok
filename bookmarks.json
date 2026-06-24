@@ -4,11 +4,5 @@
         "name": "গুগল অনুসন্ধান / Google Search",
         "url": "https://google.com",
         "visible": true
-    },
-    {
-        "id": "2",
-        "name": "গিটহাব প্রোফাইল / GitHub",
-        "url": "https://github.com",
-        "visible": true
     }
 ]
