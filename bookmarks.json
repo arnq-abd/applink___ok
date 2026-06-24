@@ -10,11 +10,5 @@
         "name": "গিটহাব প্রোফাইল / GitHub",
         "url": "https://github.com",
         "visible": true
-    },
-    {
-        "id": "4",
-        "name": "লুকানো বুকমার্ক উদাহরণ / Sample Hidden Link",
-        "url": "https://example.com",
-        "visible": false
     }
 ]
