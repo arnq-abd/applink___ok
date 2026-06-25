@@ -1,26 +1,8 @@
 [
     {
         "id": "1",
-        "name": "গুগল অনুসন্ধান / Google Search",
-        "url": "https://google.com",
+        "name": "MDRD | Server 1",
+        "url": "https://mdrs.unaux.com/?i=1",
         "visible": true
-    },
-    {
-        "id": "2",
-        "name": "গিটহাব প্রোফাইল / GitHub",
-        "url": "https://github.com",
-        "visible": true
-    },
-    {
-        "id": "3",
-        "name": "অচল লিঙ্ক উদাহরণ / Sample Disabled Link",
-        "url": "",
-        "visible": true
-    },
-    {
-        "id": "4",
-        "name": "লুকানো বুকমার্ক উদাহরণ / Sample Hidden Link",
-        "url": "https://example.com",
-        "visible": false
     }
 ]
