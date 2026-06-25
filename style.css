@@ -355,18 +355,21 @@ body {
     transition: background-color 0.3s ease, backdrop-filter 0.3s ease, -webkit-backdrop-filter 0.3s ease;
 }
 
-.bookmark-card.clickable:hover {
+.bookmark-card.clickable:hover,
+.bookmark-card.clickable.selected {
     transform: translateY(-4px);
     box-shadow: none;
 }
 
-.bookmark-card.clickable:hover .card-content {
+.bookmark-card.clickable:hover .card-content,
+.bookmark-card.clickable.selected .card-content {
     background: var(--card-bg-hover);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
 
-.bookmark-card.clickable:hover::before {
+.bookmark-card.clickable:hover::before,
+.bookmark-card.clickable.selected::before {
     top: 0;
     left: 0;
     width: 100%;
@@ -457,7 +460,8 @@ body {
     color: var(--accent);
 }
 
-.bookmark-card.clickable:hover .card-icon-box {
+.bookmark-card.clickable:hover .card-icon-box,
+.bookmark-card.clickable.selected .card-icon-box {
     background: var(--accent);
     color: white;
     transform: scale(1.05);

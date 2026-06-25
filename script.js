@@ -154,6 +154,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.target = '_blank';
                 card.rel = 'noopener noreferrer';
                 card.classList.add('clickable');
+
+                // Single click to select/highlight card
+                card.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelectorAll('.bookmark-card').forEach(c => {
+                        if (c !== card) c.classList.remove('selected');
+                    });
+                    card.classList.add('selected');
+                });
+
+                // Double click to open the link
+                card.addEventListener('dblclick', (e) => {
+                    window.open(bookmark.url, '_blank', 'noopener,noreferrer');
+                });
             } else if (isEditMode) {
                 card.classList.add('editor-mode-card');
                 // Open edit modal on click in edit mode
@@ -480,6 +494,15 @@ document.addEventListener('DOMContentLoaded', () => {
             passwordError.classList.remove('hidden');
             passwordInput.focus();
             passwordInput.select();
+        }
+    });
+
+    // Global click listener to deselect bookmarks when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.bookmark-card')) {
+            document.querySelectorAll('.bookmark-card').forEach(c => {
+                c.classList.remove('selected');
+            });
         }
     });
 
