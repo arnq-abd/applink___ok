@@ -38,8 +38,8 @@ html {
 
 [data-theme="light"] {
     /* Light Theme Variables */
-    --bg-primary: #eef2f6;
-    --bg-secondary: #ffffff;
+    --bg-primary: #cacfd4;
+    --bg-secondary: #c5bcbc;
     --card-bg-hover: rgba(255, 255, 255, 0.65);
     --card-bg-gradient: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85));
     --border-color: rgba(15, 23, 42, 0.28);
@@ -870,10 +870,12 @@ input:checked+.slider:before {
         align-items: flex-start;
         padding: 1.5rem 1rem;
     }
+
     .bg-blur-1 {
         width: 150px;
         height: 150px;
     }
+
     .bg-blur-2 {
         width: 180px;
         height: 180px;
@@ -922,6 +924,7 @@ input:checked+.slider:before {
         flex-direction: column;
         gap: 0.75rem;
     }
+
     .editor-actions .add-btn,
     .editor-actions .export-btn {
         width: 100%;
