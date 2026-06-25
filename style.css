@@ -38,7 +38,7 @@ html {
 
 [data-theme="light"] {
     /* Light Theme Variables */
-    --bg-primary: #f8fafc;
+    --bg-primary: #eef2f6;
     --bg-secondary: #ffffff;
     --card-bg-hover: rgba(255, 255, 255, 0.65);
     --card-bg-gradient: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85));
