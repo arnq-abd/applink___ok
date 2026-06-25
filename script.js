@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const moonIcon = document.getElementById('moon-icon');
     const htmlElement = document.documentElement;
 
-    const savedTheme = localStorage.getItem('theme') || 
-                       (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    const savedTheme = localStorage.getItem('theme') ||
+        (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
     setTheme(savedTheme);
 
     themeToggleBtn.addEventListener('click', () => {
@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. State Management for Bookmarks
     let bookmarks = [];
     let isEditMode = false;
+    let githubToken = localStorage.getItem('GITHUB_TOKEN') || '';
 
     const defaultBookmarks = [
         {
@@ -45,28 +46,11 @@ document.addEventListener('DOMContentLoaded', () => {
             name: 'গিটহাব প্রোফাইল / GitHub',
             url: 'https://github.com',
             visible: true
-        },
-        {
-            id: '3',
-            name: 'অচল লিঙ্ক উদাহরণ / Sample Disabled Link',
-            url: '', // Empty URL makes it unclickable
-            visible: true
-        },
-        {
-            id: '4',
-            name: 'লুকানো বুকমার্ক উদাহরণ / Sample Hidden Link',
-            url: 'https://example.com',
-            visible: false // Hidden by default from visitors
         }
+
     ];
 
     // GitHub API Configuration
-    const part1 = 'ghp_G7';
-    const part2 = 'BGqXhU4Nj';
-    const part3 = 'Dx8kfk2w';
-    const part4 = 'gPg0wgfM';
-    const part5 = 'nVp4dpPcp';
-    const GITHUB_TOKEN = part1 + part2 + part3 + part4 + part5;
     const REPO_OWNER = 'arnq-abd';
     const REPO_NAME = 'mdrs';
     const FILE_PATH = 'bookmarks.json';
@@ -74,11 +58,15 @@ document.addEventListener('DOMContentLoaded', () => {
     async function saveBookmarksToGitHub() {
         try {
             const getUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
+            const headers = {
+                'Accept': 'application/vnd.github.v3+json'
+            };
+            if (githubToken) {
+                headers['Authorization'] = `token ${githubToken}`;
+            }
+
             const getResponse = await fetch(getUrl, {
-                headers: {
-                    'Authorization': `token ${GITHUB_TOKEN}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
+                headers: headers
             });
 
             if (!getResponse.ok) {
@@ -94,8 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const putResponse = await fetch(getUrl, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `token ${GITHUB_TOKEN}`,
-                    'Accept': 'application/vnd.github.v3+json',
+                    ...headers,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -110,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(errorData.message || 'Failed to update file on GitHub');
             }
 
-            alert('বুকমার্ক সফলভাবে গিটহাবে সংরক্ষণ করা হয়েছে!\nসব ডিভাইসে পরিবর্তনটি কার্যকর হতে ১-২ মিনিট সময় লাগতে পারে।');
+            alert('বুকমার্ক সফলভাবে গিটহাবে সংরক্ষণ করা হয়েছে এবং এটি সাথে সাথে লাইভ হয়ে গেছে!');
             return true;
         } catch (error) {
             console.error('Error saving to GitHub:', error);
@@ -119,10 +106,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Load bookmarks from bookmarks.json, fallback to defaults
+    // Load bookmarks from GitHub REST API, falling back to local file or defaults
     async function loadBookmarks() {
         try {
-            const response = await fetch('./bookmarks.json');
+            const getUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
+            const headers = {
+                'Accept': 'application/vnd.github.v3+json'
+            };
+            if (githubToken) {
+                headers['Authorization'] = `token ${githubToken}`;
+            }
+            const response = await fetch(`${getUrl}?t=${Date.now()}`, {
+                headers: headers
+            });
+
+            if (response.ok) {
+                const fileMeta = await response.json();
+                const base64Content = fileMeta.content.replace(/\s/g, '');
+                const jsonString = decodeURIComponent(escape(atob(base64Content)));
+                const data = JSON.parse(jsonString);
+                if (Array.isArray(data)) {
+                    bookmarks = data;
+                    renderBookmarks();
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to load bookmarks from GitHub REST API, falling back to local file', e);
+        }
+
+        // Fallback to local bookmarks.json
+        try {
+            const response = await fetch(`./bookmarks.json?t=${Date.now()}`);
             if (response.ok) {
                 const data = await response.json();
                 if (Array.isArray(data)) {
@@ -132,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (e) {
-            console.warn('Failed to load bookmarks.json, falling back to defaults', e);
+            console.warn('Failed to load local bookmarks.json fallback, falling back to defaults', e);
         }
 
         bookmarks = [...defaultBookmarks];
@@ -156,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Create main card element
             const card = document.createElement(isEditMode || !isClickable ? 'div' : 'a');
             card.className = 'bookmark-card';
-            
+
             if (!isEditMode && isClickable) {
                 card.href = bookmark.url;
                 card.target = '_blank';
@@ -234,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Escape helper to prevent HTML injection
     function escapeHTML(str) {
-        return str.replace(/[&<>'"]/g, 
+        return str.replace(/[&<>'"]/g,
             tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
         );
     }
@@ -290,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     cancelBtn.addEventListener('click', closeEditModal);
-    
+
     // Close modal if clicking overlay
     document.querySelector('.modal-overlay').addEventListener('click', closeEditModal);
 
@@ -300,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Edit Existing Bookmark
             const bookmark = bookmarks.find(b => b.id === String(id));
             if (!bookmark) return;
-            
+
             modalTitle.textContent = 'বুকমার্ক সম্পাদনা / Edit Bookmark';
             bookmarkIdInput.value = bookmark.id;
             bookmarkNameInput.value = bookmark.name;
@@ -324,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle form submit (Save/Create)
     bookmarkForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const id = bookmarkIdInput.value;
         const name = bookmarkNameInput.value.trim();
         const url = bookmarkUrlInput.value.trim();
@@ -350,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveBtn.disabled = true;
 
         const success = await saveBookmarksToGitHub();
-        
+
         if (success) {
             renderBookmarks();
             closeEditModal();
@@ -403,10 +418,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const passwordCancel = document.getElementById('password-cancel');
 
     logoTitle.style.cursor = 'pointer';
-    
+
     logoTitle.addEventListener('click', () => {
         const isHidden = editorToggleBtn.classList.contains('hidden');
-        
+
         if (isHidden) {
             logoClicks++;
             if (logoClicks === 9) {
@@ -435,24 +450,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function hideEditorToggle() {
         editorToggleBtn.classList.add('hidden');
+        githubToken = '';
+        localStorage.removeItem('GITHUB_TOKEN');
         if (isEditMode) {
             isEditMode = false;
             editorToggleBtn.classList.remove('active');
             editorActionsBar.classList.add('hidden');
             renderBookmarks();
         }
+        alert('এডিটর মোড লক করা হয়েছে এবং টোকেন মুছে ফেলা হয়েছে! / Editor Mode locked and token cleared!');
     }
 
     passwordCancel.addEventListener('click', closePasswordModal);
     document.getElementById('password-overlay').addEventListener('click', closePasswordModal);
 
-    passwordForm.addEventListener('submit', (e) => {
+    async function verifyToken(token) {
+        try {
+            const getUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
+            const response = await fetch(getUrl, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            return response.ok;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    passwordForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const enteredPassword = passwordInput.value;
+        const enteredToken = passwordInput.value.trim();
         
-        if (enteredPassword === '2026') {
+        const submitBtn = passwordForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'যাচাই করা হচ্ছে... / Verifying...';
+        submitBtn.disabled = true;
+
+        const isValid = await verifyToken(enteredToken);
+        
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+
+        if (isValid) {
+            githubToken = enteredToken;
+            localStorage.setItem('GITHUB_TOKEN', enteredToken);
             editorToggleBtn.classList.remove('hidden');
             closePasswordModal();
+            loadBookmarks();
         } else {
             passwordError.classList.remove('hidden');
             passwordInput.focus();
@@ -461,5 +507,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Initialize Page
+    if (githubToken) {
+        editorToggleBtn.classList.remove('hidden');
+    }
     loadBookmarks();
 });
