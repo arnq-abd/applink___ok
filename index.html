@@ -70,8 +70,31 @@
 
         <footer class="footer">
             <p>Developed By MasterABD © <span id="current-year"></span> All rights reserved.</p>
-            <p>Contact 01632-306003</p>
+            <p>Contact <span id="contact-link" class="contact-number-btn">01632-306003</span></p>
         </footer>
+    </div>
+
+    <!-- Contact Options Action Sheet -->
+    <div id="contact-modal" class="modal hidden">
+        <div class="modal-overlay" id="contact-overlay"></div>
+        <div class="modal-content action-sheet-content">
+            <h2>যোগাযোগের মাধ্যম / Contact Options</h2>
+            <div class="action-sheet-buttons">
+                <a href="tel:+8801632306003" class="action-btn call-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    <span>সরাসরি কল / Direct Call</span>
+                </a>
+                <a href="https://wa.me/8801632306003" target="_blank" rel="noopener noreferrer" class="action-btn whatsapp-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.731-1.456L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.69 1.988 14.221.959 11.6.959c-5.442 0-9.866 4.372-9.87 9.802 0 1.696.447 3.354 1.298 4.85l-.993 3.626 3.71-.973zm11.514-6.076c-.303-.151-1.791-.88-2.057-.977-.266-.097-.459-.146-.653.146-.193.293-.748.927-.917 1.122-.169.196-.338.22-.641.069-.303-.151-1.278-.47-2.434-1.498-.899-.8-1.507-1.787-1.684-2.088-.177-.302-.019-.465.132-.615.136-.135.303-.351.454-.527.152-.176.202-.302.303-.503.101-.2.05-.376-.025-.527-.076-.151-.653-1.562-.895-2.148-.235-.568-.474-.49-.653-.499-.169-.008-.362-.01-.555-.01-.193 0-.507.073-.772.361-.266.288-1.013.987-1.013 2.408s1.037 2.793 1.182 2.988c.145.195 2.04 3.099 4.941 4.339.69.295 1.229.471 1.648.603.693.22 1.325.189 1.824.115.556-.083 1.791-.73 2.046-1.437.256-.708.256-1.317.18-1.437-.076-.12-.266-.195-.569-.346z"/>
+                    </svg>
+                    <span>হোয়াটসঅ্যাপ মেসেজ / WhatsApp</span>
+                </a>
+            </div>
+            <button id="contact-cancel" class="btn-secondary action-sheet-cancel">বাতিল / Cancel</button>
+        </div>
     </div>
 
     <!-- Edit Modal Dialog -->

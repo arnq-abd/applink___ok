@@ -928,3 +928,120 @@ input:checked+.slider:before {
         flex: none;
     }
 }
+
+/* Contact Options Action Sheet Styles */
+.contact-number-btn {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.contact-number-btn:hover {
+    opacity: 0.85;
+    color: #ec4899;
+}
+
+.action-sheet-content {
+    background: var(--modal-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 2.25rem 2rem 2rem 2rem;
+    max-width: 420px !important;
+}
+
+.action-sheet-content h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+}
+
+.action-sheet-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    margin-bottom: 1.5rem;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.9rem;
+    border-radius: 14px;
+    font-family: var(--font-primary);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.call-btn {
+    background: linear-gradient(135deg, var(--accent), #4f46e5);
+    color: white !important;
+    border: none;
+}
+
+.call-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(var(--accent-rgb), 0.35);
+}
+
+.whatsapp-btn {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: white !important;
+    border: none;
+}
+
+.whatsapp-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.35);
+}
+
+.action-btn svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.action-sheet-cancel {
+    width: 100%;
+    border-radius: 14px;
+    padding: 0.9rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    #contact-modal {
+        align-items: flex-end;
+    }
+
+    #contact-modal .action-sheet-content {
+        width: 100%;
+        max-width: 100% !important;
+        border-radius: 24px 24px 0 0;
+        padding-bottom: 2.5rem;
+        animation: slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        border-bottom: none;
+    }
+}
+
+@keyframes slide-up {
+    from {
+        transform: translateY(100%);
+        opacity: 0.5;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

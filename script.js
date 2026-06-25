@@ -503,6 +503,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 8. Contact Modal Controllers
+    const contactModal = document.getElementById('contact-modal');
+    const contactLink = document.getElementById('contact-link');
+    const contactOverlay = document.getElementById('contact-overlay');
+    const contactCancelBtn = document.getElementById('contact-cancel');
+    const contactActionBtns = document.querySelectorAll('#contact-modal .action-btn');
+
+    if (contactLink) {
+        contactLink.addEventListener('click', () => {
+            contactModal.classList.remove('hidden');
+        });
+    }
+
+    function closeContactModal() {
+        contactModal.classList.add('hidden');
+    }
+
+    if (contactOverlay) {
+        contactOverlay.addEventListener('click', closeContactModal);
+    }
+
+    if (contactCancelBtn) {
+        contactCancelBtn.addEventListener('click', closeContactModal);
+    }
+
+    contactActionBtns.forEach(btn => {
+        btn.addEventListener('click', closeContactModal);
+    });
+
     // Initialize Page
     if (githubToken) {
         editorToggleBtn.classList.remove('hidden');
