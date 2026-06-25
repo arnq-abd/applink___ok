@@ -1,33 +1,10 @@
 // Interactive Logic for Bookmark Launchpad Manager
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Theme Configuration
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    const sunIcon = document.getElementById('sun-icon');
-    const moonIcon = document.getElementById('moon-icon');
+    // 1. Theme Configuration (Forced Dark Theme)
     const htmlElement = document.documentElement;
-
-    const savedTheme = localStorage.getItem('theme') ||
-        (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-    setTheme(savedTheme);
-
-    themeToggleBtn.addEventListener('click', () => {
-        const currentTheme = htmlElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        setTheme(newTheme);
-    });
-
-    function setTheme(theme) {
-        htmlElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-        if (theme === 'light') {
-            sunIcon.classList.add('hidden');
-            moonIcon.classList.remove('hidden');
-        } else {
-            moonIcon.classList.add('hidden');
-            sunIcon.classList.remove('hidden');
-        }
-    }
+    htmlElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('theme', 'dark');
 
     // 2. State Management for Bookmarks
     let bookmarks = [];
