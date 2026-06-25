@@ -146,13 +146,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Create main card element
-            const card = document.createElement(isEditMode || !isClickable ? 'div' : 'a');
+            const card = document.createElement('div');
             card.className = 'bookmark-card';
 
             if (!isEditMode && isClickable) {
-                card.href = bookmark.url;
-                card.target = '_blank';
-                card.rel = 'noopener noreferrer';
                 card.classList.add('clickable');
 
                 // Single click to select/highlight card
