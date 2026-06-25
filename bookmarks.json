@@ -4,5 +4,11 @@
         "name": "MDRD | Server 1",
         "url": "https://mdrs.unaux.com/?i=1",
         "visible": true
+    },
+    {
+        "id": "1782373952488",
+        "name": "MDRD | Server 2",
+        "url": "",
+        "visible": true
     }
 ]
