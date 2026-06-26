@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // GitHub API Configuration
     const REPO_OWNER = 'arnq-abd';
-    const REPO_NAME = 'mdrs';
+    const REPO_NAME = 'applink___ok';
     const FILE_PATH = 'bookmarks.json';
 
     async function saveBookmarksToGitHub() {
