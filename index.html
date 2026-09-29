@@ -1,167 +1,140 @@
 <!DOCTYPE html>
-<html lang="bn-BD" data-theme="dark">
+<html lang="bn" data-theme="dark">
 
 <head>
+<!--
+==================================================
+                 DOCUMENT METADATA
+==================================================
+-->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বুকমার্ক লঞ্চপ্যাড | Bookmark Launchpad</title>
-    <meta name="description" content="একটি ডাইনামিক এবং কাস্টমাইজযোগ্য বুকমার্ক ম্যানেজার।">
-    <!-- Google Fonts -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>linkbd.vip — এন্টারপ্রাইজ সিস্টেম ও অ্যাপ প্ল্যাটফর্ম</title>
+    <meta name="description" content="linkbd.vip সিকিউর সিস্টেম হাব ও অ্যাপ প্ল্যাটফর্ম।">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-    <!-- CSS Stylesheet -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tiro+Bangla:ital@0;1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z'/></svg>">
 </head>
 
 <body>
-    <!-- Background Blur Decorative Elements -->
-    <div class="bg-blur-container">
-        <div class="bg-blur bg-blur-1"></div>
-        <div class="bg-blur bg-blur-2"></div>
+<!--
+==================================================
+              BACKGROUND GLOW & CANVAS
+==================================================
+-->
+    <div class="bg-glow-container" aria-hidden="true">
+        <div class="glow-orb orb-primary"></div>
+        <div class="glow-orb orb-secondary"></div>
     </div>
 
-    <div class="container">
-        <!-- Header Controls -->
-        <header class="header-controls">
-            <div class="logo-wrapper">
-                <h1 class="logo-title">🔗\pp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|__in|&lt;</h1>
-                <span class="logo-slogan">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Network Connects
-                    You . . .</span>
+<!--
+==================================================
+             INITIAL CHECKING SPINNER
+==================================================
+-->
+    <div id="connection-loader" class="state-container">
+        <div class="loader-card">
+            <div class="pulse-beacon">
+                <span class="beacon-ring"></span>
+                <span class="beacon-dot"></span>
             </div>
-            <div class="control-actions">
-                <!-- Editor Mode Toggle -->
-                <button id="editor-toggle" class="control-btn-text hidden" aria-label="Toggle Editor Mode">
-                    <svg class="control-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                    <span>এডিট মোড / Edit Mode</span>
-                </button>
+            <h1 class="loader-title">সার্ভার সংযোগ যাচাই করা হচ্ছে...</h1>
+            <p class="loader-subtitle">অনুগ্রহ করে কয়েক সেকেন্ড অপেক্ষা করুন, লোকাল সিস্টেমের সাথে সুরক্ষিত টানেল যাচাই চলছে।</p>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill"></div>
             </div>
-        </header>
-
-        <!-- Main Bookmarks Section -->
-        <main>
-            <div id="bookmarks-grid" class="bookmarks-grid">
-                <!-- Bookmarks will be dynamically injected here via JS -->
-            </div>
-
-            <!-- Editor Actions Bar (Only visible in Edit Mode) -->
-            <div id="editor-actions-bar" class="editor-actions hidden">
-                <button id="add-bookmark-btn" class="add-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span>নতুন বুকমার্ক যোগ করুন / Add New Bookmark</span>
-                </button>
-                <button id="export-json-btn" class="export-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                    </svg>
-                    <span>কনফিগারেশন কপি করুন / Copy JSON Config</span>
-                </button>
-            </div>
-        </main>
-
-        <footer class="footer">
-            <p>Developed By MasterABD © <span id="current-year"></span> All rights reserved.</p>
-            <p>Contact <span id="contact-link" class="contact-number-btn">01632-306003</span></p>
-        </footer>
+        </div>
     </div>
 
-    <!-- Contact Options Action Sheet -->
-    <div id="contact-modal" class="modal hidden">
-        <div class="modal-overlay" id="contact-overlay"></div>
-        <div class="modal-content action-sheet-content">
-            <h2>যোগাযোগের মাধ্যম / Contact Options</h2>
-            <div class="action-sheet-buttons">
-                <a href="tel:+8801632306003" class="action-btn call-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+<!--
+==================================================
+         OFFLINE FALLBACK & 1-HOUR TIMER
+==================================================
+-->
+    <div id="offline-shield" class="state-container hidden">
+        <div class="offline-card">
+            <div class="status-badge-wrap">
+                <span class="status-badge offline-badge">
+                    <span class="badge-dot"></span>
+                    <span class="badge-text">সার্ভার সাময়িক বন্ধ</span>
+                </span>
+            </div>
+
+            <div class="offline-icon-wrap">
+                <svg class="offline-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+            </div>
+
+            <h2 class="offline-title">সার্ভার বর্তমানে অফলাইন রয়েছে</h2>
+            <p class="offline-desc">
+                আমাদের লোকাল সিস্টেমটি বর্তমানে বন্ধ বা স্লিপ মোডে আছে। <strong>অনুগ্রহ করে ১ ঘণ্টা পর আবার চেষ্টা করুন।</strong>
+            </p>
+
+            <!-- 1-Hour Interactive Countdown Timer -->
+            <div class="countdown-wrapper">
+                <div class="countdown-label">পুনরায় চালু হওয়ার আনুমানিক সময়</div>
+                <div class="timer-display" id="timer-display">
+                    <div class="timer-block">
+                        <span class="timer-digit" id="timer-hours">00</span>
+                        <span class="timer-unit">ঘণ্টা</span>
+                    </div>
+                    <span class="timer-separator">:</span>
+                    <div class="timer-block">
+                        <span class="timer-digit" id="timer-minutes">59</span>
+                        <span class="timer-unit">মিনিট</span>
+                    </div>
+                    <span class="timer-separator">:</span>
+                    <div class="timer-block">
+                        <span class="timer-digit" id="timer-seconds">59</span>
+                        <span class="timer-unit">সেকেন্ড</span>
+                    </div>
+                </div>
+                <div class="timer-progress-track">
+                    <div class="timer-progress-bar" id="timer-progress-bar"></div>
+                </div>
+            </div>
+
+            <!-- Single-Line Action Triggers -->
+            <div class="offline-actions">
+                <button type="button" id="btn-retry" class="action-btn btn-primary-glow">
+                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    <span>সরাসরি কল / Direct Call</span>
-                </a>
-                <a href="https://wa.me/8801632306003" target="_blank" rel="noopener noreferrer" class="action-btn whatsapp-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                    <span class="btn-text">এখনই পুনরায় চেষ্টা করুন</span>
+                </button>
+
+                <a href="https://wa.me/8801632306003?text=আসসালামু%20আলাইকুম,%20app.linkbd.vip%20সার্ভার%20অফলাইন%20দেখাচ্ছে।" target="_blank" rel="noopener noreferrer" class="action-btn btn-secondary-glass">
+                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.731-1.456L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.69 1.988 14.221.959 11.6.959c-5.442 0-9.866 4.372-9.87 9.802 0 1.696.447 3.354 1.298 4.85l-.993 3.626 3.71-.973zm11.514-6.076c-.303-.151-1.791-.88-2.057-.977-.266-.097-.459-.146-.653.146-.193.293-.748.927-.917 1.122-.169.196-.338.22-.641.069-.303-.151-1.278-.47-2.434-1.498-.899-.8-1.507-1.787-1.684-2.088-.177-.302-.019-.465.132-.615.136-.135.303-.351.454-.527.152-.176.202-.302.303-.503.101-.2.05-.376-.025-.527-.076-.151-.653-1.562-.895-2.148-.235-.568-.474-.49-.653-.499-.169-.008-.362-.01-.555-.01-.193 0-.507.073-.772.361-.266.288-1.013.987-1.013 2.408s1.037 2.793 1.182 2.988c.145.195 2.04 3.099 4.941 4.339.69.295 1.229.471 1.648.603.693.22 1.325.189 1.824.115.556-.083 1.791-.73 2.046-1.437.256-.708.256-1.317.18-1.437-.076-.12-.266-.195-.569-.346z"/>
                     </svg>
-                    <span>হোয়াটসঅ্যাপ মেসেজ / WhatsApp</span>
+                    <span class="btn-text">হোয়াটসঅ্যাপ সাপোর্ট</span>
                 </a>
             </div>
-            <button id="contact-cancel" class="btn-secondary action-sheet-cancel">বাতিল / Cancel</button>
+
+            <footer class="offline-footer">
+                <p>Developed By MasterABD © <span id="current-year"></span> All rights reserved.</p>
+                <p>হটলাইন: <a href="tel:+8801632306003" class="contact-link">01632-306003</a></p>
+            </footer>
         </div>
     </div>
 
-    <!-- Edit Modal Dialog -->
-    <div id="bookmark-modal" class="modal hidden">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <h2 id="modal-title">বুকমার্ক সম্পাদনা / Edit Bookmark</h2>
-            <form id="bookmark-form">
-                <input type="hidden" id="bookmark-id">
-
-                <div class="form-group">
-                    <label for="bookmark-name">নাম / Bookmark Name</label>
-                    <input type="text" id="bookmark-name" required placeholder="যেমন: গুগল, ফেসবুক, ইত্যাদি">
-                </div>
-
-                <div class="form-group">
-                    <label for="bookmark-url">লিংক / URL (ফাঁকা রাখলে অচল হবে)</label>
-                    <input type="url" id="bookmark-url" placeholder="https://example.com">
-                </div>
-
-                <div class="form-group-row">
-                    <div class="toggle-container">
-                        <label class="switch">
-                            <input type="checkbox" id="bookmark-visible" checked>
-                            <span class="slider round"></span>
-                        </label>
-                        <span class="toggle-label">ভিজিটরদের দেখান / Show to Visitors</span>
-                    </div>
-                </div>
-
-                <div class="modal-actions">
-                    <button type="button" id="modal-delete" class="btn-danger hidden">মুছুন / Delete</button>
-                    <div class="modal-main-actions">
-                        <button type="button" id="modal-cancel" class="btn-secondary">বাতিল / Cancel</button>
-                        <button type="submit" id="modal-save" class="btn-primary">সংরক্ষণ / Save</button>
-                    </div>
-                </div>
-            </form>
-        </div>
+<!--
+==================================================
+           ACTIVE LIVE APP FULL VIEWPORT
+==================================================
+-->
+    <div id="live-app-wrap" class="live-app-container hidden">
+        <iframe id="live-frame" src="about:blank" allow="geolocation; microphone; camera; display-capture; clipboard-read; clipboard-write; autoplay" title="System Farmer Hub"></iframe>
     </div>
 
-    <!-- Token Modal Dialog -->
-    <div id="password-modal" class="modal hidden">
-        <div class="modal-overlay" id="password-overlay"></div>
-        <div class="modal-content">
-            <h2>গিটহাব টোকেন দিন / Enter GitHub Token</h2>
-            <form id="password-form">
-                <div class="form-group">
-                    <label for="password-input">Personal Access Token (PAT)</label>
-                    <input type="password" id="password-input" required
-                        placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
-                    <span id="password-error" class="hidden"
-                        style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem; display: block;">ভুল
-                        টোকেন বা নেটওয়ার্ক এরর! আবার চেষ্টা করুন।</span>
-                </div>
-                <div class="modal-actions">
-                    <div class="modal-main-actions" style="width: 100%;">
-                        <button type="button" id="password-cancel" class="btn-secondary" style="flex-grow: 1;">বাতিল /
-                            Cancel</button>
-                        <button type="submit" class="btn-primary" style="flex-grow: 1;">নিশ্চিত করুন / Submit</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Script File -->
+<!--
+==================================================
+                 APPLICATION SCRIPT
+==================================================
+-->
     <script src="script.js"></script>
 </body>
 
