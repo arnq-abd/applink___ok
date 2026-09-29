@@ -2,13 +2,69 @@
 //              CONFIGURATION & CONSTANTS
 // ==================================================
 const CONFIG = {
-    TUNNEL_HEALTH_URL: 'https://architect.tailc7c6f8.ts.net/linkbd.vip/api/health.php',
-    TUNNEL_APP_URL: 'https://architect.tailc7c6f8.ts.net/',
-    CHECK_TIMEOUT_MS: 3800,
+    TUNNEL_HEALTH_URL: 'linkbd.vip/api/health.php',
+    TUNNEL_APP_URL: '',
+    CHECK_TIMEOUT_MS: 4000,
     TOTAL_COUNTDOWN_SECONDS: 3600, // 1 hour (১ ঘণ্টা)
     BACKGROUND_POLL_INTERVAL_MS: 45000, // 45 seconds auto-poll
-    STORAGE_KEY_OFFLINE_EXPIRY: 'linkbd_offline_countdown_expiry'
+    STORAGE_KEY_OFFLINE_EXPIRY: 'linkbd_offline_countdown_expiry',
+    TUNNEL_SOURCE_RAW: 'https://raw.githubusercontent.com/arnq-abd/applink___ok/main/active_tunnel.json',
+    TUNNEL_SOURCE_API: 'https://api.github.com/repos/arnq-abd/applink___ok/contents/active_tunnel.json'
 };
+
+// ==================================================
+//             DYNAMIC TUNNEL RESOLVER
+// ==================================================
+async function resolveActiveTunnelUrl() {
+    const timestamp = Date.now();
+    
+    // 1. Try fast GitHub raw endpoint with cache-busting query
+    try {
+        const rawRes = await fetch(`${CONFIG.TUNNEL_SOURCE_RAW}?_cb=${timestamp}`, {
+            cache: 'no-store',
+            mode: 'cors'
+        });
+        if (rawRes.ok) {
+            const data = await rawRes.json().catch(() => null);
+            if (data && data.tunnel_url && typeof data.tunnel_url === 'string') {
+                applyTunnelUrl(data.tunnel_url);
+                return;
+            }
+        }
+    } catch (e) {
+        // Continue to API fallback
+    }
+
+    // 2. Secondary fallback using GitHub API contents
+    try {
+        const apiRes = await fetch(`${CONFIG.TUNNEL_SOURCE_API}?_cb=${timestamp}`, {
+            cache: 'no-store',
+            mode: 'cors'
+        });
+        if (apiRes.ok) {
+            const apiJson = await apiRes.json().catch(() => null);
+            if (apiJson && apiJson.content) {
+                const decoded = atob(apiJson.content.replace(/\s/g, ''));
+                const parsed = JSON.parse(decoded);
+                if (parsed && parsed.tunnel_url && typeof parsed.tunnel_url === 'string') {
+                    applyTunnelUrl(parsed.tunnel_url);
+                    return;
+                }
+            }
+        }
+    } catch (e) {
+        // Fallback remains as is
+    }
+}
+
+function applyTunnelUrl(url) {
+    let clean = url.trim();
+    if (!clean.endsWith('/')) {
+        clean += '/';
+    }
+    CONFIG.TUNNEL_APP_URL = clean;
+    CONFIG.TUNNEL_HEALTH_URL = `${clean}linkbd.vip/api/health.php`;
+}
 
 // ==================================================
 //               DOM ELEMENT REFERENCES
@@ -34,6 +90,13 @@ let isCurrentlyOnline = false;
 //            SERVER CONNECTIVITY TESTER
 // ==================================================
 async function checkServerStatus() {
+    if (!CONFIG.TUNNEL_APP_URL) {
+        await resolveActiveTunnelUrl();
+        if (!CONFIG.TUNNEL_APP_URL) {
+            return false;
+        }
+    }
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), CONFIG.CHECK_TIMEOUT_MS);
 
@@ -62,6 +125,9 @@ async function checkServerStatus() {
 
 // Fallback secondary test using an image beacon
 function testImageBeacon() {
+    if (!CONFIG.TUNNEL_APP_URL) {
+        return Promise.resolve(false);
+    }
     return new Promise((resolve) => {
         const img = new Image();
         const timeout = setTimeout(() => {
@@ -180,6 +246,7 @@ function updateTimerDisplay(targetExpiry) {
 // ==================================================
 async function attemptConnection() {
     showCheckingLoader();
+    await resolveActiveTunnelUrl();
     const online = await checkServerStatus();
 
     if (online) {
@@ -197,6 +264,7 @@ if (btnRetry) {
         btnRetry.style.pointerEvents = 'none';
         btnRetry.style.opacity = '0.7';
 
+        await resolveActiveTunnelUrl();
         const online = await checkServerStatus();
 
         if (online) {
@@ -220,6 +288,7 @@ if (btnRetry) {
 // Background auto-polling (checks every 45s if offline)
 backgroundPollTimer = setInterval(async () => {
     if (!isCurrentlyOnline) {
+        await resolveActiveTunnelUrl();
         const online = await checkServerStatus();
         if (online) {
             setOnlineState();
