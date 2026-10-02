@@ -112,7 +112,16 @@ async function checkServerStatus() {
         clearTimeout(timeoutId);
 
         if (response.ok) {
-            const data = await response.json().catch(() => null);
+            const rawText = await response.text().catch(() => '');
+            let data = null;
+            try {
+                data = JSON.parse(rawText);
+            } catch (e) {
+                const jsonMatch = rawText.match(/\{[\s\S]*"status"\s*:\s*"online"[\s\S]*\}/);
+                if (jsonMatch) {
+                    try { data = JSON.parse(jsonMatch[0]); } catch (e2) {}
+                }
+            }
             return data && data.status === 'online';
         }
         return false;
