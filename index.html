@@ -126,6 +126,31 @@
 
 <!--
 ==================================================
+        SERVER ONLINE REDIRECT POPUP MODAL
+==================================================
+-->
+    <div id="online-popup-modal" class="modal-overlay hidden" aria-modal="true" role="dialog">
+        <div class="online-popup-card">
+            <div class="online-beacon-wrap">
+                <span class="online-glow-ring"></span>
+                <span class="online-glow-dot">
+                    <svg class="online-check-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </span>
+            </div>
+            <h2 class="online-popup-title">সার্ভার ইতিমধ্যে চালু হয়েছে!</h2>
+            <p class="online-popup-desc">
+                <span class="popup-countdown-badge">কয়েক সেকেন্ডের মধ্যে আপনাকে রিডাইরেক্ট করা হচ্ছে...</span>
+            </p>
+            <div class="redirect-progress-track">
+                <div class="redirect-progress-bar" id="redirect-progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+<!--
+==================================================
            ACTIVE LIVE APP FULL VIEWPORT
 ==================================================
 -->

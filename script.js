@@ -17,7 +17,10 @@ const CONFIG = {
 //               DOM ELEMENT REFERENCES
 // ==================================================
 const loaderContainer = document.getElementById('connection-loader');
+const loaderTitle = document.querySelector('.loader-title');
 const offlineShield = document.getElementById('offline-shield');
+const onlinePopupModal = document.getElementById('online-popup-modal');
+const redirectProgressBar = document.getElementById('redirect-progress-bar');
 const liveAppWrap = document.getElementById('live-app-wrap');
 const liveFrame = document.getElementById('live-frame');
 
@@ -33,6 +36,7 @@ let countdownInterval = null;
 let backgroundPollTimer = null;
 let isCurrentlyOnline = false;
 let offlineStartTime = 0;
+let isTransitioningToLive = false;
 
 // ==================================================
 //             HELPER UTILITIES & CLEANERS
@@ -237,7 +241,6 @@ async function checkServerStatus() {
         return false;
     } catch (error) {
         clearTimeout(timeoutId);
-        // Fast secondary check using Image beacon
         return await testImageBeacon();
     }
 }
@@ -269,9 +272,27 @@ function testImageBeacon() {
 }
 
 // ==================================================
-//              STATE TRANSITION LOGIC
+//        SMOOTH TRANSITION & ZERO-BLACK SCREEN
 // ==================================================
-function setOnlineState() {
+function revealLiveAppNow() {
+    liveAppWrap.classList.remove('hidden');
+    requestAnimationFrame(() => {
+        liveAppWrap.classList.add('ready');
+    });
+
+    setTimeout(() => {
+        loaderContainer.classList.add('hidden');
+        offlineShield.classList.add('hidden');
+        if (onlinePopupModal) {
+            onlinePopupModal.classList.add('hidden');
+        }
+        isTransitioningToLive = false;
+    }, 350);
+}
+
+function setOnlineState(wasWaitingOnOfflinePage = false) {
+    if (isTransitioningToLive) return;
+    isTransitioningToLive = true;
     isCurrentlyOnline = true;
     offlineStartTime = 0;
 
@@ -283,24 +304,69 @@ function setOnlineState() {
         localStorage.removeItem(CONFIG.STORAGE_KEY_OFFLINE_EXPIRY);
     } catch (e) {}
 
-    loaderContainer.classList.add('hidden');
-    offlineShield.classList.add('hidden');
-    liveAppWrap.classList.remove('hidden');
+    // Prepare iframe loading behind current overlay
+    let frameAlreadyLoaded = false;
+    const targetUrl = CONFIG.TUNNEL_APP_URL;
 
-    // Automatically load / sync the live URL inside the main frame
-    if (!liveFrame.src || liveFrame.src === 'about:blank' || liveFrame.src !== CONFIG.TUNNEL_APP_URL) {
-        liveFrame.src = CONFIG.TUNNEL_APP_URL;
+    // Safety fallback timer so UI never hangs
+    const safetyTimer = setTimeout(() => {
+        revealLiveAppNow();
+    }, wasWaitingOnOfflinePage ? 2400 : 2000);
+
+    const onFrameLoadHandler = () => {
+        if (!frameAlreadyLoaded) {
+            frameAlreadyLoaded = true;
+            clearTimeout(safetyTimer);
+            if (wasWaitingOnOfflinePage) {
+                // Wait for the redirect popup animation to complete
+                setTimeout(revealLiveAppNow, 1200);
+            } else {
+                revealLiveAppNow();
+            }
+        }
+    };
+
+    liveFrame.onload = onFrameLoadHandler;
+
+    if (!liveFrame.src || liveFrame.src === 'about:blank' || liveFrame.src !== targetUrl) {
+        liveFrame.src = targetUrl;
+    } else {
+        // Iframe was already set
+        onFrameLoadHandler();
+    }
+
+    if (wasWaitingOnOfflinePage) {
+        // User was on the offline countdown page: show the redirect notice modal
+        if (onlinePopupModal) {
+            onlinePopupModal.classList.remove('hidden');
+            if (redirectProgressBar) {
+                redirectProgressBar.style.width = '0%';
+                requestAnimationFrame(() => {
+                    redirectProgressBar.style.width = '100%';
+                });
+            }
+        }
+    } else {
+        // User was looking at the initial checking spinner
+        if (loaderTitle) {
+            loaderTitle.textContent = 'সার্ভার প্রস্তুত, লাইভ পোর্টাল লোড হচ্ছে...';
+        }
     }
 }
 
 function setOfflineState() {
     isCurrentlyOnline = false;
+    isTransitioningToLive = false;
     if (!offlineStartTime) {
         offlineStartTime = Date.now();
     }
 
     loaderContainer.classList.add('hidden');
+    liveAppWrap.classList.remove('ready');
     liveAppWrap.classList.add('hidden');
+    if (onlinePopupModal) {
+        onlinePopupModal.classList.add('hidden');
+    }
     offlineShield.classList.remove('hidden');
 
     if (liveFrame.src && liveFrame.src !== 'about:blank') {
@@ -311,9 +377,16 @@ function setOfflineState() {
 }
 
 function showCheckingLoader() {
+    if (loaderTitle) {
+        loaderTitle.textContent = 'সার্ভার সংযোগ যাচাই করা হচ্ছে...';
+    }
     loaderContainer.classList.remove('hidden');
     offlineShield.classList.add('hidden');
+    if (onlinePopupModal) {
+        onlinePopupModal.classList.add('hidden');
+    }
     liveAppWrap.classList.add('hidden');
+    liveAppWrap.classList.remove('ready');
 }
 
 // ==================================================
@@ -389,8 +462,9 @@ function scheduleNextPoll() {
             await resolveActiveTunnelUrl(true);
             const online = await checkServerStatus();
             if (online) {
-                setOnlineState();
-                return; // Stop polling once online
+                // Was waiting on the offline page!
+                setOnlineState(true);
+                return;
             }
         }
         if (!isCurrentlyOnline) {
@@ -403,12 +477,15 @@ function scheduleNextPoll() {
 //             INITIALIZATION & EVENT HANDLERS
 // ==================================================
 async function attemptConnection() {
-    showCheckingLoader();
+    const isCurrentlyShowingOffline = !offlineShield.classList.contains('hidden');
+    if (!isCurrentlyShowingOffline) {
+        showCheckingLoader();
+    }
     await resolveActiveTunnelUrl();
     const online = await checkServerStatus();
 
     if (online) {
-        setOnlineState();
+        setOnlineState(isCurrentlyShowingOffline);
     } else {
         setOfflineState();
         scheduleNextPoll();
@@ -428,7 +505,7 @@ if (btnRetry) {
         const online = await checkServerStatus();
 
         if (online) {
-            setOnlineState();
+            setOnlineState(true);
         } else {
             setOfflineState();
             scheduleNextPoll();
