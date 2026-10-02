@@ -280,14 +280,23 @@ function revealLiveAppNow() {
         liveAppWrap.classList.add('ready');
     });
 
+    if (loaderContainer) {
+        loaderContainer.classList.add('fade-out');
+    }
+    if (onlinePopupModal) {
+        onlinePopupModal.classList.add('hidden');
+    }
+
     setTimeout(() => {
-        loaderContainer.classList.add('hidden');
-        offlineShield.classList.add('hidden');
-        if (onlinePopupModal) {
-            onlinePopupModal.classList.add('hidden');
+        if (loaderContainer) {
+            loaderContainer.classList.add('hidden');
+            loaderContainer.classList.remove('fade-out');
+        }
+        if (offlineShield) {
+            offlineShield.classList.add('hidden');
         }
         isTransitioningToLive = false;
-    }, 350);
+    }, 550);
 }
 
 function setOnlineState(wasWaitingOnOfflinePage = false) {
@@ -307,22 +316,24 @@ function setOnlineState(wasWaitingOnOfflinePage = false) {
     // Prepare iframe loading behind current overlay
     let frameAlreadyLoaded = false;
     const targetUrl = CONFIG.TUNNEL_APP_URL;
+    const startTime = Date.now();
+    const minDisplayMs = wasWaitingOnOfflinePage ? 2200 : 1500;
 
     // Safety fallback timer so UI never hangs
     const safetyTimer = setTimeout(() => {
-        revealLiveAppNow();
-    }, wasWaitingOnOfflinePage ? 2400 : 2000);
+        if (!frameAlreadyLoaded) {
+            frameAlreadyLoaded = true;
+            revealLiveAppNow();
+        }
+    }, wasWaitingOnOfflinePage ? 2800 : 2500);
 
     const onFrameLoadHandler = () => {
         if (!frameAlreadyLoaded) {
             frameAlreadyLoaded = true;
             clearTimeout(safetyTimer);
-            if (wasWaitingOnOfflinePage) {
-                // Wait for the redirect popup animation to complete
-                setTimeout(revealLiveAppNow, 1200);
-            } else {
-                revealLiveAppNow();
-            }
+            const elapsed = Date.now() - startTime;
+            const remainingWait = Math.max(0, minDisplayMs - elapsed);
+            setTimeout(revealLiveAppNow, remainingWait);
         }
     };
 
@@ -349,7 +360,11 @@ function setOnlineState(wasWaitingOnOfflinePage = false) {
     } else {
         // User was looking at the initial checking spinner
         if (loaderTitle) {
-            loaderTitle.textContent = 'সার্ভার প্রস্তুত, লাইভ পোর্টাল লোড হচ্ছে...';
+            loaderTitle.textContent = 'সার্ভার সচল রয়েছে এবং লাইভ দেখানো হচ্ছে';
+        }
+        const loaderSubtitle = document.getElementById('loader-subtitle');
+        if (loaderSubtitle) {
+            loaderSubtitle.innerHTML = '<span class="subtitle-line">লাইভ সিস্টেমের সাথে সুরক্ষিত সংযোগ সফল হয়েছে।</span><span class="subtitle-line">কয়েক মুহূর্তের মধ্যে ড্যাশবোর্ড প্রদর্শিত হচ্ছে...</span>';
         }
     }
 }
